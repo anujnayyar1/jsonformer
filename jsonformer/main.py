@@ -11,6 +11,7 @@ import json
 
 GENERATION_MARKER = "|GENERATION|"
 
+print("importing modded JSONformer")
 
 class Jsonformer:
     value: Dict[str, Any] = {}
@@ -24,9 +25,9 @@ class Jsonformer:
         *,
         debug: bool = False,
         max_array_length: int = 10,
-        max_number_tokens: int = 20,
+        max_number_tokens: int = 6,
         temperature: float = 0.7,
-        max_string_token_length: int = 20,
+        max_string_token_length: int = 10,
     ):
         self.model = model
         self.tokenizer = tokenizer
@@ -53,6 +54,7 @@ class Jsonformer:
                 cprint(value, "blue")
 
     def generate_number(self, temperature: Union[float, None] = None, iterations=0):
+        prompt = self.get_prompt()
         self.debug("[generate_number]", prompt, is_prompt=True)
         input_tokens = self.tokenizer.encode(prompt, return_tensors="pt").to(
             self.model.device
@@ -81,6 +83,7 @@ class Jsonformer:
                 raise ValueError("Failed to generate a valid number")
 
             return self.generate_number(temperature=self.temperature * 1.3, iterations=iterations+1)
+
 
     def generate_boolean(self) -> bool:
         prompt = self.get_prompt()
