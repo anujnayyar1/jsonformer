@@ -24,9 +24,9 @@ class Jsonformer:
         *,
         debug: bool = False,
         max_array_length: int = 10,
-        max_number_tokens: int = 6,
-        temperature: float = 1.0,
-        max_string_token_length: int = 10,
+        max_number_tokens: int = 20,
+        temperature: float = 0.7,
+        max_string_token_length: int = 20,
     ):
         self.model = model
         self.tokenizer = tokenizer
@@ -53,7 +53,6 @@ class Jsonformer:
                 cprint(value, "blue")
 
     def generate_number(self, temperature: Union[float, None] = None, iterations=0):
-        prompt = self.get_prompt()
         self.debug("[generate_number]", prompt, is_prompt=True)
         input_tokens = self.tokenizer.encode(prompt, return_tensors="pt").to(
             self.model.device
@@ -68,6 +67,7 @@ class Jsonformer:
             ],
             temperature=temperature or self.temperature,
             pad_token_id=self.tokenizer.eos_token_id,
+            do_sample=True
         )
         response = self.tokenizer.decode(response[0], skip_special_tokens=True)
 
@@ -118,6 +118,7 @@ class Jsonformer:
                 StringStoppingCriteria(self.tokenizer, len(input_tokens[0]))
             ],
             pad_token_id=self.tokenizer.eos_token_id,
+            do_sample=True
         )
 
         # Some models output the prompt as part of the response
